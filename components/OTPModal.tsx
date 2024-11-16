@@ -1,7 +1,5 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "./ui/button";
-import { useRouter } from "next/navigation";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -11,13 +9,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import React, { useState } from "react";
 import Image from "next/image";
-import { sendEmailOTP, verifySecret } from "@/lib/actions/users.actions";
+import { Button } from "@/components/ui/button";
+import { verifySecret, sendEmailOTP } from "@/lib/actions/users.actions";
+import { useRouter } from "next/navigation";
+
 const OtpModal = ({
   accountId,
   email,
@@ -33,12 +36,17 @@ const OtpModal = ({
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setIsLoading(true);
+
     try {
       const sessionId = await verifySecret({ accountId, password });
+
+      console.log({ sessionId });
+
       if (sessionId) router.push("/");
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.log("Failed to verify OTP", error);
     }
+
     setIsLoading(false);
   };
 
@@ -51,9 +59,9 @@ const OtpModal = ({
       <AlertDialogContent className="shad-alert-dialog">
         <AlertDialogHeader className="relative flex justify-center">
           <AlertDialogTitle className="h2 text-center">
-            Enter your OTP{" "}
+            Enter Your OTP
             <Image
-              src="/assets/icon/close-dark.svg"
+              src="/assets/icons/close-dark.svg"
               alt="close"
               width={20}
               height={20}
@@ -62,30 +70,19 @@ const OtpModal = ({
             />
           </AlertDialogTitle>
           <AlertDialogDescription className="subtitle-2 text-center text-light-100">
-            We have sent an OTP to your email address. Please enter the OTP to
-            continue.
+            We&apos;ve sent a code to{" "}
+            <span className="pl-1 text-brand">{email}</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <InputOTP maxLength={6} value={password} onChange={setPassword}>
           <InputOTPGroup className="shad-otp">
-            <InputOTPSlot
-              index={0}
-              className="shad-otp-slot/>
-            <InputOTPSlot index={1} className="
-              shad-otp-slot
-            />
-            <InputOTPSlot
-              index={2}
-              className="shad-otp-slot/>
-            <InputOTPSlot index={3} className="
-              shad-otp-slot
-            />
-            <InputOTPSlot
-              index={4}
-              className="shad-otp-slot />
-            <InputOTPSlot index={5} className="
-              shad-otp-slot
-            />
+            <InputOTPSlot index={0} className="shad-otp-slot" />
+            <InputOTPSlot index={1} className="shad-otp-slot" />
+            <InputOTPSlot index={2} className="shad-otp-slot" />
+            <InputOTPSlot index={3} className="shad-otp-slot" />
+            <InputOTPSlot index={4} className="shad-otp-slot" />
+            <InputOTPSlot index={5} className="shad-otp-slot" />
           </InputOTPGroup>
         </InputOTP>
 
@@ -107,21 +104,23 @@ const OtpModal = ({
                 />
               )}
             </AlertDialogAction>
-          </div>
-          <div className="subtitle-2 mt-2 text-center">
-            Didn&apos;t get a code?
-            <Button
-              type="button"
-              variant="link"
-              className="pl-1 text-brand"
-              onClick={handleResendOtp}
-            >
-              Resend OTP
-            </Button>
+
+            <div className="subtitle-2 mt-2 text-center text-light-100">
+              Didn&apos;t get a code?
+              <Button
+                type="button"
+                variant="link"
+                className="pl-1 text-brand"
+                onClick={handleResendOtp}
+              >
+                Click to resend
+              </Button>
+            </div>
           </div>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
   );
 };
+
 export default OtpModal;
